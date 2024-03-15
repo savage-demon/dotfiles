@@ -78,10 +78,12 @@ eval "$(zoxide init zsh)"
 export VISUAL="nvim"
 export EDITOR="$VISUAL"
 
+alias vim="nvim"
+
 # exa
 alias ls="exa --icons"
-alias ll="exa -lh --icons"
-alias la="exa -lah --icons"
+alias ll="exa -lah --icons"
+alias la="exa -a --icons"
 alias tree="exa --tree --icons -L 2"
 
 # cd zoxide

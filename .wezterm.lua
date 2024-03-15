@@ -4,9 +4,9 @@ local config = {}
 config.font = wezterm.font("JetBrainsMono Nerd Font", { weight = "Regular", stretch = "Normal", style = "Normal" })
 config.font_size = 14
 config.color_scheme = "MaterialDarker"
-config.default_cursor_style = "SteadyUnderline" -- Acceptable values are SteadyBlock, BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, and BlinkingBar
+config.default_cursor_style = "SteadyBlock" -- Acceptable values are SteadyBlock, BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, and BlinkingBar
 config.freetype_load_target = "Light"
-config.font_antialias = "Subpixel"
+-- config.font_antialias = "Subpixel"
 -- config.default_domain = 'WSL:Ubuntu-22.04'
 
 config.keys = {
