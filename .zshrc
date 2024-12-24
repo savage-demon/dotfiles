@@ -116,6 +116,8 @@ ch(){
 # pacman -S
 alias pac="sudo pacman -S"
 
+alias bpaste="xclip -o -sel clip"
+
 chshell(){
   cht --shell "$@"
 }
@@ -129,3 +131,16 @@ iownall(){
 }
 
 alias t='task'
+if [ -f "/home/deman/.config/fabric/fabric-bootstrap.inc" ]; then . "/home/deman/.config/fabric/fabric-bootstrap.inc"; fi
+eval "$(gh copilot alias -- zsh)"
+
+# pnpm
+export PNPM_HOME="/home/deman/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+
+eval $(thefuck --alias)

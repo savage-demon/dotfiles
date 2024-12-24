@@ -2,10 +2,24 @@ local wezterm = require("wezterm")
 local config = {}
 
 config.font = wezterm.font("JetBrainsMono Nerd Font", { weight = "Regular", stretch = "Normal", style = "Normal" })
-config.font_size = 14
-config.color_scheme = "MaterialDarker"
-config.default_cursor_style = "SteadyBlock" -- Acceptable values are SteadyBlock, BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, and BlinkingBar
-config.freetype_load_target = "Light"
+config.font_size = 11
+
+local TMEcolor = wezterm.color.get_builtin_schemes()["MaterialDarker"]
+TMEcolor.background = "#191C22"
+TMEcolor.selection_fg = "black"
+
+config.color_schemes = {
+	["TME"] = TMEcolor,
+}
+
+config.color_scheme = "TME"
+
+-- config.color_scheme = "MaterialDarker"
+-- config.color_scheme = "Astrodark (Gogh)"
+
+-- Acceptable values are SteadyBlock, BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, and BlinkingBar
+config.default_cursor_style = "SteadyBlock"
+config.freetype_load_target = "HorizontalLcd"
 -- config.font_antialias = "Subpixel"
 -- config.default_domain = 'WSL:Ubuntu-22.04'
 
