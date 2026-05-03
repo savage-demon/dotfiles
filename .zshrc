@@ -37,8 +37,11 @@ plugins=(git zsh-syntax-highlighting zsh-autosuggestions fzf-tab)
 
 
 # User configuration
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/tmp}/ssh-agent.socket"
+if [ ! -S "$SSH_AUTH_SOCK" ]; then
+    ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
+fi
 
-eval "$(ssh-agent -s)" > /dev/null
 ssh-add ~/.ssh/id_ed25519_toolkit_gitlab &>/dev/null
 
 # Path to your oh-my-zsh installation.
@@ -78,7 +81,25 @@ eval "$(zoxide init zsh)"
 export VISUAL="nvim"
 export EDITOR="$VISUAL"
 
+# попробуем кикстарт
+# export NVIM_APPNAME=kickstart
+
 alias vim="nvim"
+
+# neovim vanilla
+alias vnvim="NVIM_APPNAME=vim nvim"
+
+# neovim astronvim
+alias astronvim="NVIM_APPNAME=astronvim nvim"
+
+# neovim nvchad
+alias nvchad="NVIM_APPNAME=nvchad nvim"
+
+# neovim lazyvim
+alias lazyvim="NVIM_APPNAME=lazyvim nvim"
+
+# neovim kickstart nvim
+alias ksnvim="NVIM_APPNAME=kickstart nvim"
 
 # exa
 alias ls="exa --icons"
@@ -99,18 +120,64 @@ alias tldrf='tldr --list | fzf --preview "tldr {1}" --preview-window=right,70% |
 alias colorgrid='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
 
 
-#cat bat
-alias cat="bat"
-
 #zellij
 alias zj="zellij"
 
 #helix
 alias hx="helix"
 
+alias kub="k9s -c dp"
+
+alias yayi='yay -S --noconfirm --needed --sudoloop'
+
+alias wco='wl-copy'
+alias wpa='wl-paste'
+
+alias zconf='nvim ~/.zshrc && source ~/.zshrc'
+
+alias lg='lazygit'
+
+# Универсальный и безопасный алиас для вставки из буфера
+alias -g V='"$(wl-paste | sed "s/[[:space:]]*$//")"'
+
+alias get_idf='. $HOME/.espressif/esp-idf/export.sh'
+
+cb() {
+  if [ -f "$1" ]; then
+    # Если передан существующий файл
+    local file_path=$(realpath "$1")
+    echo -n "copy\nfile://$file_path" | wl-copy -t x-special/gnome-copied-files
+    echo "Файл $1 скопирован в буфер"
+  else
+    # Если это текст или вывод через пайп
+    if [ -t 0 ]; then
+      # Если аргумент передан текстом: cb "привет"
+      echo -n "$@" | wl-copy
+      echo "Текст скопирован"
+    else
+      # Если данные пришли через пайп: ls | cb
+      wl-copy
+      echo "Вывод команды скопирован"
+    fi
+  fi
+}
+
+
+
 # curl cheat
 ch(){
   cht "$@" | bat
+}
+
+# поиск пакетов в yay
+yays() {
+  yay -Sl | awk '{print $2 ($4=="" ? "" : " [УСТАНОВЛЕНО]")}' | \
+  fzf --multi \
+      --preview 'yay -Si {1}' \
+      --header "Vim: Ctrl-J/K — список, Ctrl-H/L — прокрутка. Выбор: TAB, Установка: ENTER." \
+      --header-first \
+      --bind 'ctrl-j:down,ctrl-k:up,ctrl-h:preview-half-page-up,ctrl-l:preview-half-page-down' | \
+  awk '{print $1}' | xargs -ro yay -S
 }
 
 # pacman -S
@@ -130,9 +197,15 @@ iownall(){
   sudo chown -R deman:deman *
 }
 
+mkd(){
+  mkdir -p "$@" && cd "$_"
+}
+
 alias t='task'
 if [ -f "/home/deman/.config/fabric/fabric-bootstrap.inc" ]; then . "/home/deman/.config/fabric/fabric-bootstrap.inc"; fi
-eval "$(gh copilot alias -- zsh)"
+
+alias matrix="unimatrix -abf -s 96"
+
 
 # pnpm
 export PNPM_HOME="/home/deman/.local/share/pnpm"
@@ -144,3 +217,50 @@ esac
 
 
 eval $(thefuck --alias)
+
+
+alias sz="source ~/.zshrc"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/deman/.lmstudio/bin"
+# End of LM Studio CLI section
+
+
+alias archupdate="yay -Syu --needed --noconfirm --sudoloop "
+export PATH="$HOME/.local/bin:$PATH"
+
+
+export TERMINAL=kitty
+
+export GOTOOLCHAIN=auto
+
+# Функция для быстрой очистки корня
+clean_system() {
+    echo "--- Анализ места ДО очистки ---"
+    df -h / | awk 'NR==2 {print "Доступно: " $4 " (из " $2 ")"}'
+    echo "--------------------------------"
+
+    echo "1/4: Очистка кэша pacman..."
+    sudo rm -f /var/cache/pacman/pkg/*.part
+    sudo pacman -Scc --noconfirm
+    
+    echo "2/4: Очистка системного журнала (до 500МБ)..."
+    sudo journalctl --vacuum-size=500M
+    
+    echo "3/4: Удаление coredumps..."
+    sudo rm -rf /var/lib/systemd/coredump/*
+    
+    echo "4/4: Удаление неиспользуемых данных Flatpak..."
+    if command -v flatpak &> /dev/null; then
+        sudo flatpak uninstall --unused -y
+    fi
+    
+    echo "--------------------------------"
+    echo "--- Анализ места ПОСЛЕ очистки ---"
+    df -h / | awk 'NR==2 {print "Доступно: " $4 " (из " $2 ")"}'
+}
+
+
+alias mem="smem -rkc 'name uss' | head -20"
+
+export CAVEMAN_DEFAULT_MODE=ultra
